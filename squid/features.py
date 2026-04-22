@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.stats import entropy
+from squid.thermodynamics import estimate_lambda, estimate_beta
 
 def calculate_shannon_entropy(series, bins=10):
     """Calculate Shannon Entropy of a series by binning values"""
@@ -22,5 +23,9 @@ def build_features(df, y_col="10Y_3M"):
     df["MA"] = df["y"].rolling(50).mean()
     df["STD"] = df["y"].rolling(50).std()
     df["Z_Score"] = (df["y"] - df["MA"]) / df["STD"]
+    
+    # Thermodynamic Features
+    df["lambda"] = estimate_lambda(df["Z_Score"])
+    df["beta"] = estimate_beta(df)
     
     return df.dropna()

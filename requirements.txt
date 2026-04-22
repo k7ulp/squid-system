@@ -2,3 +2,4 @@ pandas
 pandas-datareader
 numpy
 scipy
+scikit-learn
