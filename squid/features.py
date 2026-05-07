@@ -28,4 +28,11 @@ def build_features(df, y_col="10Y_3M"):
     df["lambda"] = estimate_lambda(df["Z_Score"])
     df["beta"] = estimate_beta(df)
     
+    # Oil Shock Features
+    if "Oil" in df.columns:
+        df["Oil_Return"] = df["Oil"].pct_change()
+        df["Oil_5D_Change"] = df["Oil"].pct_change(5)
+        df["Oil_Vol"] = df["Oil_Return"].rolling(20).std()
+        df["Oil_Shock"] = (df["Oil_5D_Change"] - df["Oil_5D_Change"].rolling(50).mean()) / (df["Oil_5D_Change"].rolling(50).std() + 1e-6)
+    
     return df.dropna()

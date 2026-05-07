@@ -19,6 +19,10 @@ def run_backtest(df, holding_period=10, use_dynamic_exit=False):
     dir_col = "Billygoat"
     if "Thermostat" in df.columns:
         dir_col = "Thermostat"
+    if "ShockSignal" in df.columns:
+        dir_col = "ShockSignal"
+    if "Integrated_Dir" in df.columns:
+        dir_col = "Integrated_Dir"
 
     # For beta spike detection (rolling mean of beta)
     beta_ma = df["beta"].rolling(50).mean() if "beta" in df.columns else None

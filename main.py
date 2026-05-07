@@ -27,15 +27,31 @@ def main():
     print("\n--- Thermodynamic Agent (Dynamic Exit: Decay/Spikes) ---")
     results_th_dyn = optimize(df, agent_type="thermodynamic", use_dynamic_exit=True)
     print(results_th_dyn.head(3))
+
+    # Run optimization for Commodity Shock Agent
+    print("\n--- Commodity Shock Agent Results ---")
+    results_cs = optimize(df, agent_type="commodity_shock")
+    print(results_cs.head(3))
+
+    # Run optimization for Integrated Agent
+    print("\n--- Integrated Agent Results ---")
+    results_int = optimize(df, agent_type="integrated")
+    print(results_int.head(3))
     
     # Compare
-    if not results_th_dyn.empty and not results_bg.empty:
-        best_bg = results_bg.iloc[0]["total_pnl"]
-        best_th = results_th_dyn.iloc[0]["total_pnl"]
-        print(f"\nBillygoat Best PnL: {best_bg:.4f}")
-        print(f"Thermodynamic (Dynamic) Best PnL: {best_th:.4f}")
-        winner = "Thermodynamic" if best_th > best_bg else "Billygoat"
-        print(f"Overall Winner: {winner}")
+    comparison = []
+    if not results_bg.empty: comparison.append(("Billygoat", results_bg.iloc[0]["total_pnl"]))
+    if not results_th_dyn.empty: comparison.append(("Thermodynamic", results_th_dyn.iloc[0]["total_pnl"]))
+    if not results_cs.empty: comparison.append(("Commodity Shock", results_cs.iloc[0]["total_pnl"]))
+    if not results_int.empty: comparison.append(("Integrated", results_int.iloc[0]["total_pnl"]))
+
+    if comparison:
+        print("\n--- Final Comparison (Best Total PnL) ---")
+        for name, pnl in comparison:
+            print(f"{name}: {pnl:.4f}")
+        
+        winner = max(comparison, key=lambda x: x[1])
+        print(f"\nOverall Winner: {winner[0]} with PnL {winner[1]:.4f}")
 
 if __name__ == "__main__":
     main()

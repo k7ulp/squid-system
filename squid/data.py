@@ -10,7 +10,8 @@ def load_fred_data(start="2020-01-01", end=None):
     series = {
         "DGS10": "10Y",
         "DGS5": "5Y",
-        "DGS3MO": "3M"
+        "DGS3MO": "3M",
+        "DCOILWTICO": "Oil"
     }
     
     dfs = []
@@ -29,7 +30,7 @@ def load_fred_data(start="2020-01-01", end=None):
             continue
 
     if not dfs:
-        return pd.DataFrame(columns=["Date", "10Y", "5Y", "3M", "10Y_5Y", "10Y_3M"])
+        return pd.DataFrame(columns=["Date", "10Y", "5Y", "3M", "Oil", "10Y_5Y", "10Y_3M"])
 
     # Merge all series on Date
     df = dfs[0]
@@ -39,7 +40,7 @@ def load_fred_data(start="2020-01-01", end=None):
     df = df.sort_values("Date").reset_index(drop=True)
     
     # Standardize types
-    for col in ["10Y", "5Y", "3M"]:
+    for col in ["10Y", "5Y", "3M", "Oil"]:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
     
