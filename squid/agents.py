@@ -92,8 +92,64 @@ def apply_integrated_agent(df):
     
     return df
 
-def apply_agents(df, slope_thresh=0.03, agent_type="billygoat"):
+def apply_epistemic_agent(df, engine):
+    """
+    Epistemic Agent:
+    - Uses the EpistemicEngine to generate a BeliefState for every step.
+    - Decisions are based on consensus relevance and confidence.
+    """
     df = df.copy()
+    signals = []
+    directions = []
+    sizes = []
+    
+    for _, row in df.iterrows():
+        belief = engine.process_step(row)
+        
+        # Logic: If confidence is high and a relevant feature is stretched
+        # This is a simplified version of the epistemic reasoning
+        relevance = belief.relevance_map
+        oil_rel = relevance.get("Oil_Shock", 0)
+        z_rel = relevance.get("Z_Score", 0)
+        
+        signal = 0
+        direction = 0
+        size = 1.0
+        
+        if belief.confidence > 0.6:
+            # If Oil is highly relevant (Commodity Shock regime)
+            if oil_rel > 0.7:
+                if row.get("Oil_Shock", 0) > 2.0:
+                    signal = 1
+                    direction = 1
+                elif row.get("Oil_Shock", 0) < -2.0:
+                    signal = 1
+                    direction = -1
+            
+            # If Z_Score is highly relevant (Low Vol regime)
+            elif z_rel > 0.6:
+                if row.get("Z_Score", 0) < -2.0:
+                    signal = 1
+                    direction = 1
+                elif row.get("Z_Score", 0) > 2.0:
+                    signal = 1
+                    direction = -1
+                    
+        signals.append(signal)
+        directions.append(direction)
+        sizes.append(belief.confidence * 2.0) # Size scales with confidence
+        
+    df["TradeSignal"] = signals
+    df["Epistemic_Dir"] = directions
+    df["PositionSize"] = sizes
+    
+    return df
+
+def apply_agents(df, slope_thresh=0.03, agent_type="billygoat", engine=None):
+    df = df.copy()
+    
+    if agent_type == "epistemic" and engine is not None:
+        return apply_epistemic_agent(df, engine)
     
     if agent_type == "thermodynamic":
         return apply_thermodynamic_agent(df)

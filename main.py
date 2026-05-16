@@ -37,6 +37,11 @@ def main():
     print("\n--- Integrated Agent Results ---")
     results_int = optimize(df, agent_type="integrated")
     print(results_int.head(3))
+
+    # Run optimization for Epistemic Agent
+    print("\n--- Epistemic (Adaptive) Agent Results ---")
+    results_epi = optimize(df, agent_type="epistemic")
+    print(results_epi.head(3))
     
     # Compare
     comparison = []
@@ -44,6 +49,7 @@ def main():
     if not results_th_dyn.empty: comparison.append(("Thermodynamic", results_th_dyn.iloc[0]["total_pnl"]))
     if not results_cs.empty: comparison.append(("Commodity Shock", results_cs.iloc[0]["total_pnl"]))
     if not results_int.empty: comparison.append(("Integrated", results_int.iloc[0]["total_pnl"]))
+    if not results_epi.empty: comparison.append(("Epistemic", results_epi.iloc[0]["total_pnl"]))
 
     if comparison:
         print("\n--- Final Comparison (Best Total PnL) ---")
