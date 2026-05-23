@@ -8,8 +8,12 @@ def load_fred_data(start="2020-01-01", end=None):
     
     # FRED series IDs
     series = {
+        "DGS30": "30Y",
         "DGS10": "10Y",
         "DGS5": "5Y",
+        "DGS2": "2Y",
+        "DGS1": "1Y",
+        "DGS6MO": "6M",
         "DGS3MO": "3M",
         "DCOILWTICO": "Oil"
     }
@@ -30,7 +34,7 @@ def load_fred_data(start="2020-01-01", end=None):
             continue
 
     if not dfs:
-        return pd.DataFrame(columns=["Date", "10Y", "5Y", "3M", "Oil", "10Y_5Y", "10Y_3M"])
+        return pd.DataFrame(columns=["Date", "30Y", "10Y", "5Y", "2Y", "1Y", "6M", "3M", "Oil"])
 
     # Merge all series on Date
     df = dfs[0]
@@ -40,16 +44,18 @@ def load_fred_data(start="2020-01-01", end=None):
     df = df.sort_values("Date").reset_index(drop=True)
     
     # Standardize types
-    for col in ["10Y", "5Y", "3M", "Oil"]:
+    for col in ["30Y", "10Y", "5Y", "2Y", "1Y", "6M", "3M", "Oil"]:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
     
     df = df.dropna()
 
     # Compute spreads
-    if "10Y" in df.columns and "5Y" in df.columns:
-        df["10Y_5Y"] = df["10Y"] - df["5Y"]
+    if "10Y" in df.columns and "2Y" in df.columns:
+        df["10Y_2Y"] = df["10Y"] - df["2Y"]
     if "10Y" in df.columns and "3M" in df.columns:
         df["10Y_3M"] = df["10Y"] - df["3M"]
+    if "6M" in df.columns and "3M" in df.columns:
+        df["6M_3M"] = df["6M"] - df["3M"]
 
     return df

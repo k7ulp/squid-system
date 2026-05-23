@@ -5,6 +5,8 @@ from squid.regimes import RegimeDetector
 from squid.topology import MarketGraph
 from squid.features import calculate_shannon_entropy
 from squid.thermodynamics import estimate_lambda, estimate_beta
+from squid.analysis import DurationAnalyzer
+from squid.reporting import RelevanceReport
 
 class EpistemicEngine:
     """
@@ -18,6 +20,7 @@ class EpistemicEngine:
         self.topology = MarketGraph()
         self.memory = [] # List of EventMemory
         self.attention_threshold = 0.7
+        self.duration_analyzer = DurationAnalyzer()
 
     def _get_feature_state(self, name):
         if name not in self.feature_states:
@@ -49,6 +52,35 @@ class EpistemicEngine:
 
         # 7. Execution (Handled by Agents/Trading logic using BeliefState)
         return self.belief
+
+    def generate_interpretive_report(self, data_row, security_a="3M", security_b="6M"):
+        """
+        Generates a comprehensive RelevanceReport for the current state.
+        """
+        # Process the row to update internal state
+        self.process_step(data_row)
+        
+        current_regime = self.belief.active_regime
+        entropy = data_row.get("Entropy", 1.0)
+        
+        # Duration Analysis
+        yield_a = data_row.get(security_a, 0.0)
+        yield_b = data_row.get(security_b, 0.0)
+        
+        duration_analysis = self.duration_analyzer.compare(
+            security_a, security_b, yield_a, yield_b, 
+            current_regime, entropy, self.belief.confidence
+        )
+        
+        report = RelevanceReport(
+            regime=current_regime,
+            confidence=self.belief.confidence,
+            relevance_map=self.belief.relevance_map,
+            entropy=entropy,
+            duration_analysis=duration_analysis
+        )
+        
+        return report
 
     def _update_states(self, row):
         # Update raw and physics-based states
