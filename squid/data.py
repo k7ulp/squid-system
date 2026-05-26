@@ -51,6 +51,8 @@ def load_fred_data(start="2020-01-01", end=None):
     df = df.dropna()
 
     # Compute spreads
+    if "10Y" in df.columns and "5Y" in df.columns:
+        df["10Y_5Y"] = df["10Y"] - df["5Y"]
     if "10Y" in df.columns and "2Y" in df.columns:
         df["10Y_2Y"] = df["10Y"] - df["2Y"]
     if "10Y" in df.columns and "3M" in df.columns:
