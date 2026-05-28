@@ -62,7 +62,7 @@ class BeliefState:
         self.confidence = 0.5
         self.stability = "fragile"
         self.relevance_map = {}  # {feature_name: relevance_score}
-        self.active_regime = "unknown"
+        self.active_regime = None # Will hold CompoundRegimeStack
         self.uncertainty = 1.0
 
     def update_belief(self, relevance_map, confidence, regime):
@@ -79,4 +79,5 @@ class BeliefState:
             self.stability = "fragile"
 
     def __repr__(self):
-        return f"BeliefState(regime={self.active_regime}, conf={self.confidence:.2f}, stability={self.stability})"
+        regime_name = self.active_regime.get_summary_name() if self.active_regime else "None"
+        return f"BeliefState(regime={regime_name}, conf={self.confidence:.2f}, stability={self.stability})"

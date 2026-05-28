@@ -47,7 +47,7 @@ class EpistemicEngine:
         self.belief.update_belief(
             relevance_map=attention_map,
             confidence=self._calculate_confidence(),
-            regime=current_regime.name
+            regime=current_regime
         )
 
         # 7. Execution (Handled by Agents/Trading logic using BeliefState)
@@ -60,7 +60,7 @@ class EpistemicEngine:
         # Process the row to update internal state
         self.process_step(data_row)
         
-        current_regime = self.belief.active_regime
+        current_regime_stack = self.belief.active_regime
         entropy = data_row.get("Entropy", 1.0)
         
         # Duration Analysis
@@ -69,11 +69,11 @@ class EpistemicEngine:
         
         duration_analysis = self.duration_analyzer.compare(
             security_a, security_b, yield_a, yield_b, 
-            current_regime, entropy, self.belief.confidence
+            current_regime_stack, entropy, self.belief.confidence
         )
         
         report = RelevanceReport(
-            regime=current_regime,
+            regime_stack=current_regime_stack,
             confidence=self.belief.confidence,
             relevance_map=self.belief.relevance_map,
             entropy=entropy,
@@ -90,29 +90,34 @@ class EpistemicEngine:
                 state.update(row[col])
                 self.topology.add_node(col)
 
-    def _process_memory(self, regime):
+    def _process_memory(self, regime_stack):
         # Logic to record or recall events
-        if regime.name != "unknown":
+        regime_name = regime_stack.get_summary_name()
+        if regime_name != "unknown":
             # Check if this is a new event
-            if not self.memory or self.memory[-1].event_type != regime.name:
+            if not self.memory or self.memory[-1].event_type != regime_name:
                 event = EventMemory(
-                    event_type=regime.name,
+                    event_type=regime_name,
                     pre_state={name: s.current_value for name, s in self.feature_states.items()}
                 )
                 self.memory.append(event)
 
-    def _allocate_attention(self, regime):
+    def _allocate_attention(self, regime_stack):
         attention = {}
+        # Simple heuristic: use the summary name for weight lookups for now
+        # In a full compound implementation, this would aggregate weights from all regimes
+        # dominant_state = regime_stack.get_summary_name()
         for name, state in self.feature_states.items():
             # Attention = Regime Weight * State Stability * Novelty (Simplified)
-            regime_weight = regime.feature_weights.get(name, 0.5)
+            regime_weight = 0.5 
             attention[name] = regime_weight * (1.0 / (state.stability + 1e-6))
         return attention
 
     def _calculate_confidence(self):
         # Confidence is higher when features are stable and regime is known
         avg_stability = np.mean([s.stability for s in self.feature_states.values()])
-        regime_bonus = 0.2 if self.belief.active_regime != "unknown" else 0.0
+        regime_name = self.belief.active_regime.get_summary_name() if self.belief.active_regime else "unknown"
+        regime_bonus = 0.2 if regime_name != "unknown" else 0.0
         return np.clip(avg_stability + regime_bonus, 0.0, 1.0)
 
     def generate_attention_surface(self):

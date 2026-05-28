@@ -47,7 +47,7 @@ class DurationAnalyzer:
             "reinvest_risk_b": reinvest_risk_b
         }
 
-    def compare(self, security_a, security_b, yield_a, yield_b, regime, entropy, confidence):
+    def compare(self, security_a, security_b, yield_a, yield_b, regime_stack, entropy, confidence):
         """
         Generates a recommendation based on market context.
         """
@@ -56,11 +56,16 @@ class DurationAnalyzer:
         preference = "neutral"
         reason = ""
         
+        # Extract relevant states from stack
+        regime_name = regime_stack.get_summary_name() if regime_stack else "unknown"
+        liquidity = regime_stack.stack["liquidity"].state if regime_stack else "UNKNOWN"
+        monetary = regime_stack.stack["monetary"].trend if regime_stack else "STABLE"
+        
         # Logic: 
-        # If entropy is high or regime is inflationary tightening, prefer SHORTER duration (defensive)
-        if entropy > 1.5 or regime == "inflationary_tightening":
+        # If entropy is high or liquidity is restrictive, prefer SHORTER duration (defensive)
+        if entropy > 1.5 or liquidity == "Restrictive" or regime_name == "inflationary_tightening":
             preference = security_a
-            reason = f"Elevated entropy ({entropy:.2f}) or tightening regime favors defensive {security_a} duration."
+            reason = f"Elevated entropy ({entropy:.2f}) and tightening liquidity conditions favor defensive {security_a} positioning."
         
         # If entropy is low and carry is positive, prefer LONGER duration
         elif entropy < 0.8 and metrics["carry_bps"] > 10:
