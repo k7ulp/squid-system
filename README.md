@@ -12,12 +12,60 @@ The system operates on a 7-layer hierarchy designed to handle market complexity 
 6. **Interpretation**: Generating "Relevance Maps" (Attention Surfaces) that distinguish observation from belief.
 7. **Execution**: Signal generation via adaptive agents that scale size by confidence.
 
+## 🌌 Compound Regime Interpretation Engine (v0.2)
+The system has moved beyond "flat" regime detection to a **Multi-Axis Phase Space** model. Instead of identifying a single dominant state, Squid now identifies overlapping and nested regimes across seven dimensions:
+
+1. **Monetary**: Policy framework transitions (e.g., Hawkish vs. Neutral).
+2. **Liquidity**: Systemic refinancing stress and duration appetite.
+3. **Information**: Evolution from legacy broadcast narratives to AI-generated synthetic consensus.
+4. **Technological**: Structural productivity shifts (AI Acceleration).
+5. **Energy**: Electrification transitions and grid stress sensitivity.
+6. **Social**: Institutional synchronization vs. fragmentation.
+7. **Geopolitical**: Multipolar realignment and supply chain volatility.
+
+### 📉 The Role of Entropy
+Squid monitors **Global Entropy** as a proxy for market "disorder." In the 2020s era, we have observed a structural increase in entropy driven by:
+- **Narrative Volatility**: The transition from Social Media to Synthetic (AI) Media regimes.
+- **Institutional Decay**: Declining synchronization between monetary policy and fiscal reality.
+- **Reflexivity**: AI-accelerated feedback loops that compress signal half-life.
+
+When Entropy is **ELEVATED (>1.5)**, the system automatically shifts to a defensive posture, prioritizing shorter durations (3M/6M) regardless of carry advantage, as historical pricing assumptions lose stability.
+
+### 📄 Sample Output Report
+The engine generates a comprehensive **Compound Regime Interpretation Report**. Below is a sample from the current 2026 environment:
+
+```text
+====================================================================
+ SQUID SYSTEM :: COMPOUND REGIME INTERPRETATION ENGINE v0.2
+====================================================================
+CONFIDENCE: 0.92          GLOBAL ENTROPY: ELEVATED (2.09)
+--------------------------------------------------------------------
+ PRIMARY MARKET STATE: AI ACCELERATION
+ DURATION RECOMMENDATION: 3M DEFENSIVE
+--------------------------------------------------------------------
+ COMPOUND REGIME STACK:
+  [MONETARY]      Neutral (Stable)
+  [LIQUIDITY]     Adequate (Stable)
+  [INFORMATION]   Synthetic Media Transition (Accelerating)
+  [TECHNOLOGICAL] AI Acceleration (Expansionary)
+  [SOCIAL]        Fragmentation (Divergent)
+--------------------------------------------------------------------
+ REGIME INTERFERENCE MATRIX:
+  [AI Productivity] x [Demographic Aging] -> Structural labor contraction offset
+  [Liquidity Tightening] x [Narrative Volatility] -> Reduced pricing stability
+--------------------------------------------------------------------
+ RELEVANCE WEIGHTS:
+  Monetary Policy: 0.84    AI Acceleration: 0.79    Liquidity: 0.81
+====================================================================
+```
+
 ## 🚀 Features
 - **Data Source**: Fetches comprehensive Treasury data from FRED (3M, 6M, 1Y, 2Y, 5Y, 10Y, 30Y) and WTI Oil Prices.
+- **Compound Regime Mapping**: Navigates 7-dimensional phase space to identify overlapping market drivers.
+- **Regime Interference Matrix**: Models how conflicting or reinforcing regimes (e.g., AI boom vs. Demographic aging) impact systemic stability.
 - **Interpretive Navigation**: Moves beyond signal generation to explain market topology and "what matters right now."
-- **Treasury Duration Module**: Analyzes carry vs. risk tradeoffs to recommend optimal duration (e.g., 3M vs 6M) based on entropy and regime.
+- **Treasury Duration Module**: Analyzes carry vs. risk tradeoffs to recommend optimal duration based on multi-axis regime state.
 - **Thermodynamic Modeling**: Estimates market "disorder" and energy decay rates ($\lambda$, $\beta$).
-- **Graphical Reporting**: Generates automated dashboards for yield curve topology, attention surfaces, and entropy metrics.
 
 ## 🤖 Agents
 - `Epistemic`: **(Primary)** Adaptive agent using the full 7-layer engine to navigate via consensus belief.
