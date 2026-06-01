@@ -64,12 +64,16 @@ class BeliefState:
         self.relevance_map = {}  # {feature_name: relevance_score}
         self.active_regime = None # Will hold CompoundRegimeStack
         self.uncertainty = 1.0
+        self.alignment_analysis = {} # {force_name: AlignmentAnalysis}
+        self.admissible_forces = [] # List of forces that passed the ultrafilter
 
-    def update_belief(self, relevance_map, confidence, regime):
+    def update_belief(self, relevance_map, confidence, regime, alignment_analysis=None, admissible_forces=None):
         self.relevance_map = relevance_map
         self.confidence = confidence
         self.active_regime = regime
         self.uncertainty = 1.0 - confidence
+        self.alignment_analysis = alignment_analysis or {}
+        self.admissible_forces = admissible_forces or []
         
         if self.confidence > 0.8:
             self.stability = "robust"

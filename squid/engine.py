@@ -3,6 +3,7 @@ import numpy as np
 from squid.memory import FeatureState, BeliefState, EventMemory
 from squid.regimes import RegimeDetector
 from squid.topology import MarketGraph
+from squid.alignment import AlignmentLayer, CoherenceFilter
 from squid.features import calculate_shannon_entropy
 from squid.thermodynamics import estimate_lambda, estimate_beta
 from squid.analysis import DurationAnalyzer
@@ -18,6 +19,8 @@ class EpistemicEngine:
         self.belief = BeliefState()
         self.detector = RegimeDetector()
         self.topology = MarketGraph()
+        self.alignment_layer = AlignmentLayer()
+        self.coherence_filter = CoherenceFilter(self.alignment_layer)
         self.memory = [] # List of EventMemory
         self.attention_threshold = 0.7
         self.duration_analyzer = DurationAnalyzer()
@@ -43,11 +46,38 @@ class EpistemicEngine:
         # 5. Attention Allocation
         attention_map = self._allocate_attention(current_regime)
 
+        # 5.5 Alignment Layer (New)
+        # Identify key forces to evaluate based on regime members
+        forces_to_evaluate = current_regime.union() # Set of elements active in regimes
+        alignment_results = {}
+        
+        # Context for alignment evaluation
+        feature_context = {name: s.current_value for name, s in self.feature_states.items()}
+        
+        # Regime-dependent weights (simplified placeholder)
+        regime_weights = {
+            "resilience": 1.2,
+            "productivity": 1.5,
+            "entropy_effect": -2.0
+        }
+
+        for force in forces_to_evaluate:
+            alignment_results[force] = self.alignment_layer.evaluate_force(
+                force, feature_context, regime_weights
+            )
+
+        # Apply Coherence Filter (Ultrafilter)
+        admissible_forces = self.coherence_filter.select_admissible(
+            forces_to_evaluate, feature_context, regime_weights
+        )
+
         # 6. Interpretation (Generate Relevance Map / Belief Update)
         self.belief.update_belief(
             relevance_map=attention_map,
             confidence=self._calculate_confidence(),
-            regime=current_regime
+            regime=current_regime,
+            alignment_analysis=alignment_results,
+            admissible_forces=admissible_forces
         )
 
         # 7. Execution (Handled by Agents/Trading logic using BeliefState)
@@ -77,7 +107,8 @@ class EpistemicEngine:
             confidence=self.belief.confidence,
             relevance_map=self.belief.relevance_map,
             entropy=entropy,
-            duration_analysis=duration_analysis
+            duration_analysis=duration_analysis,
+            alignment_analysis=self.belief.alignment_analysis
         )
         
         return report

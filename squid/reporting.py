@@ -6,12 +6,13 @@ class RelevanceReport:
     Generates human-readable interpretive summaries of market topology
     using the Compound Regime Interpretation Engine.
     """
-    def __init__(self, regime_stack, confidence, relevance_map, entropy, duration_analysis, agent_rankings=None):
+    def __init__(self, regime_stack, confidence, relevance_map, entropy, duration_analysis, alignment_analysis=None, agent_rankings=None):
         self.regime_stack = regime_stack
         self.confidence = confidence
         self.relevance_map = relevance_map
         self.entropy = entropy
         self.duration_analysis = duration_analysis
+        self.alignment_analysis = alignment_analysis or {}
         self.agent_rankings = agent_rankings or [
             ("Commodity Shock", 1.9300),
             ("Integrated", 1.9000),
@@ -46,7 +47,22 @@ class RelevanceReport:
         report.append("")
         report.append(f"RATIONALE:\n  {self.duration_analysis['reason']}")
         report.append("")
-        report.append("KEY METRICS:")
+        report.append("--------------------------------------------------------------------")
+        report.append(" ALIGNMENT ANALYSIS (Coherent vs Entropic)")
+        report.append("--------------------------------------------------------------------")
+        report.append("")
+        if not self.alignment_analysis:
+            report.append("  No alignment data available.")
+        for force, analysis in self.alignment_analysis.items():
+            report.append(f" FORCE: {force.upper()}")
+            report.append(f"  Status:       {analysis.net_alignment.upper()}")
+            report.append("  Metrics:")
+            for m_name, m_val in analysis.metrics.items():
+                report.append(f"    {m_name:<25} {m_val:+.2f}")
+            report.append("")
+
+        report.append("--------------------------------------------------------------------")
+        report.append(" KEY METRICS:")
         metrics = self.duration_analysis["metrics"]
         report.append(f"  Carry Advantage:              {metrics['carry_bps']:+.1f} bps")
         report.append(f"  Reinvestment Risk:            {metrics['reinvest_risk_a']:.1f}x roll frequency")
@@ -92,6 +108,8 @@ class RelevanceReport:
             report.append(f"  State:            {state.state}")
             report.append(f"  Confidence:       {state.confidence:.2f}")
             report.append(f"  Trend:            {state.trend}")
+            if state.members:
+                report.append(f"  Set Membership:   {{{', '.join(sorted(state.members))}}}")
             report.append(f"  Notes:")
             report.append(f"    {state.notes}")
 
